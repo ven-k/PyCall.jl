@@ -146,9 +146,15 @@ function __init__()
     end
 
     # issue #189
-    libpy_handle = (libpython === nothing || !isdir(libpython)) ? C_NULL :
-        Libdl.dlopen(libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+    libpy_handle = libpython === nothing ? C_NULL :
+        try
+            Libdl.dlopen(libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+        catch e
+            libpython = find_libpython(current_python())
+            Libdl.dlopen(libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+        end
 
+    @info libpy_handle
     already_inited = 0 != ccall((@pysym :Py_IsInitialized), Cint, ())
 
     if !already_inited
