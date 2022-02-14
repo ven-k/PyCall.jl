@@ -1,7 +1,7 @@
 # Initializing Python (surprisingly complicated; see also deps/build.jl)
 
 #########################################################################
-
+using Python_jll
 # global PyObject constants, initialized to NULL and then overwritten in __init__
 # (eventually, the ability to define global const in __init__ may go away,
 #  and in any case this is better for type inference during precompilation)
@@ -145,15 +145,26 @@ function __init__()
         error("Using Conda.jl python, but location of $python seems to have moved to $(Conda.PYTHONDIR).  Re-run Pkg.build(\"PyCall\") and restart Julia.")
     end
 
+    try
+        @info Python_jll.libpython
+    catch e
+        @info "Couldn't find the Python_jll's libpython: " e
+    end
+
     # issue #189
-    libpy_handle = (libpython === nothing || !ispath(libpython)) ? C_NULL :
-        Libdl.dlopen(libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+    try
+        libpy_handle = (libpython === nothing || !ispath(libpython)) ? C_NULL :
+            Libdl.dlopen(Python_jll.libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+    catch e
+        @info "Initializing the libpy_handle failed: " e
+        libpy_handle = joinpath(Pkg.depots1(), "conda", "3/lib/libpython3.9.so.1.0")
+    end
 
     already_inited = 0 != ccall((@pysym :Py_IsInitialized), Cint, ())
 
     if !already_inited
         pyhome = PYTHONHOME
-
+        @info "Not inited already"
         if isfile(get(ENV, "PYCALL_JL_RUNTIME_PYTHON", ""))
             _current_python[] = ENV["PYCALL_JL_RUNTIME_PYTHON"]
 
