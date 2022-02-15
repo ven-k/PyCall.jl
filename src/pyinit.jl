@@ -1,7 +1,7 @@
 # Initializing Python (surprisingly complicated; see also deps/build.jl)
 
 #########################################################################
-
+using Pkg
 # global PyObject constants, initialized to NULL and then overwritten in __init__
 # (eventually, the ability to define global const in __init__ may go away,
 #  and in any case this is better for type inference during precompilation)
@@ -148,8 +148,8 @@ function __init__()
     if !ispath(libpython)
         Pkg.build("PyCall")
     end
-    # issue #189
 
+    # issue #189
     libpy_handle = libpython === nothing ? C_NULL :
         Libdl.dlopen(libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
 
