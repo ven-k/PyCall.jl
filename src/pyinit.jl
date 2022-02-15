@@ -126,6 +126,8 @@ function Py_Finalize()
 end
 
 function __init__()
+    ENV["PYTHON"]=Python_jll.libpython
+    @info "env" ENV["PYTHON"]
     # Clear out global states.  This is required only for PyCall
     # AOT-compiled into system image.
     _finalized[] = false
@@ -146,6 +148,12 @@ function __init__()
     end
 
     try
+        @info "Current python" current_python()
+    catch e
+        @info "Couldn't find the current_python: " e
+    end
+
+    try
         @info Python_jll.libpython
     catch e
         @info "Couldn't find the Python_jll's libpython: " e
@@ -153,6 +161,7 @@ function __init__()
 
     # issue #189
     try
+        @info libpython
         libpy_handle = Libdl.dlopen(Python_jll.libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
         @info libpy_handle
     catch e
@@ -164,6 +173,7 @@ function __init__()
 
     if !already_inited
         pyhome = PYTHONHOME
+        @info "Pyhome" pyhome
         @info "Not inited already"
         if isfile(get(ENV, "PYCALL_JL_RUNTIME_PYTHON", ""))
             _current_python[] = ENV["PYCALL_JL_RUNTIME_PYTHON"]
