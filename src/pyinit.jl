@@ -147,11 +147,18 @@ function __init__()
 
     if !ispath(libpython)
         Pkg.build("PyCall")
+        @info "Updated $libpython"
     end
 
     # issue #189
-    libpy_handle = libpython === nothing ? C_NULL :
-        Libdl.dlopen(libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+    try
+        libpy_handle = libpython === nothing ? C_NULL :
+            Libdl.dlopen(libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+    catch e
+        @info e
+        libpython = joinpath(Pkg.depots1(), "conda", "3", "lib", "libpython3.9.so.1.0")
+        libpy_handle = Libdl.dlopen(libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+    end
 
     already_inited = 0 != ccall((@pysym :Py_IsInitialized), Cint, ())
 
