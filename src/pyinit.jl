@@ -154,16 +154,16 @@ function __init__()
     end
 
     try
-        @info Python_jll.libpython
+        @info "Python_jll.libpython: " Python_jll.libpython
     catch e
         @info "Couldn't find the Python_jll's libpython: " e
     end
 
     # issue #189
     try
-        @info libpython
-        libpy_handle = Libdl.dlopen(Python_jll.libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
-        @info libpy_handle
+        @info "libpython: " libpython
+        global libpy_handle = Libdl.dlopen(Python_jll.libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+        @info "libpy_handle" libpy_handle
     catch e
         @info "Initializing the libpy_handle failed: " e
         libpy_handle = joinpath(Pkg.depots1(), "conda", "3/lib/libpython3.9.so.1.0")
@@ -176,11 +176,15 @@ function __init__()
         @info "Pyhome" pyhome
         @info "Not inited already"
         if isfile(get(ENV, "PYCALL_JL_RUNTIME_PYTHON", ""))
+            @info "inside the pycal_jl_runtime"
+            @info "ENV[\"PYCALL_JL_RUNTIME_PYTHON\"] " ENV["PYCALL_JL_RUNTIME_PYTHON"]
             _current_python[] = ENV["PYCALL_JL_RUNTIME_PYTHON"]
 
             # Check libpython compatibility.
             venv_libpython = find_libpython(current_python())
+            @info "venv $venv_libpython"
             if venv_libpython === nothing
+                @info "venv_libpython is nothing"
                 error("""
                 `libpython` for $(current_python()) cannot be found.
                 PyCall.jl cannot initialize Python safely.
@@ -208,6 +212,7 @@ function __init__()
             ENV["PATH"] = Conda.bin_dir(Conda.ROOTENV) * ";" * get(ENV, "PATH", "")
         end
 
+        @info("about to call Py_SetPythonHome()", libpy_handle, libpython)
         Py_SetPythonHome(libpy_handle, pyversion, pyhome)
         Py_SetProgramName(libpy_handle, pyversion, current_python())
         ccall((@pysym :Py_InitializeEx), Cvoid, (Cint,), 0)
