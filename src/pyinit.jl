@@ -154,6 +154,7 @@ function __init__()
     # issue #189
     try
         libpy_handle = Libdl.dlopen(Python_jll.libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+        @info libpy_handle
     catch e
         @info "Initializing the libpy_handle failed: " e
         libpy_handle = joinpath(Pkg.depots1(), "conda", "3/lib/libpython3.9.so.1.0")
