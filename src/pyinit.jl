@@ -146,8 +146,15 @@ function __init__()
     end
 
     # issue #189
-    libpy_handle = libpython === nothing ? C_NULL :
-        Libdl.dlopen(libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+    try
+        libpy_handle = libpython === nothing ? C_NULL :
+            Libdl.dlopen(libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+    catch e
+        @info "Rebuilding PyCall due to " e 
+        Pkg.build("PyCall")
+        libpy_handle = libpython === nothing ? C_NULL :
+            Libdl.dlopen(libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+    end
 
     already_inited = 0 != ccall((@pysym :Py_IsInitialized), Cint, ())
 
