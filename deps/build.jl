@@ -100,11 +100,11 @@ try # make sure deps.jl file is removed on error
     end
 
     writeifchanged("deps.jl", """
-    const python = "$(escape_string(python))"
-    const libpython = "$(escape_string(libpy_name))"
-    const pyprogramname = "$(escape_string(programname))"
-    const pyversion_build = $(repr(pyversion))
-    const PYTHONHOME = "$(escape_string(PYTHONHOME))"
+    python = "$(escape_string(python))"
+    libpython = "$(escape_string(libpy_name))"
+    pyprogramname = "$(escape_string(programname))"
+    pyversion_build = $(repr(pyversion))
+    PYTHONHOME = "$(escape_string(PYTHONHOME))"
 
     "True if we are using the Python distribution in the Conda package."
     const conda = $use_conda

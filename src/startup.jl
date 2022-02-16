@@ -65,9 +65,9 @@ else
         pathlen = something(findfirst(iszero, pathbuf)) - 1
         libname = String(Base.transcode(UInt8, pathbuf[1:pathlen]))
         if (Libdl.dlopen_e(libname) != C_NULL)
-            const libpython = libname
+            libpython = libname
         else
-            const libpython = nothing
+            libpython = nothing
         end
     else
         libpy_handle = proc_handle
@@ -81,9 +81,9 @@ else
         ccall(:dladdr, Cint, (Ptr{Cvoid}, Ptr{Dl_info}), some_address_in_main_exe,
             dlinfo2)
         if dlinfo1[].dli_fbase == dlinfo2[].dli_fbase
-            const libpython = nothing
+            libpython = nothing
         else
-            const libpython = unsafe_string(dlinfo1[].dli_fname)
+            libpython = unsafe_string(dlinfo1[].dli_fname)
         end
     end
     # If we're not in charge, assume the user is installing necessary python

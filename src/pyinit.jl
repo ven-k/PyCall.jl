@@ -158,13 +158,8 @@ function __init__()
     end
 
     # issue #189
-    libpy_handle = try
-        libpython === nothing ? C_NULL :
-            Libdl.dlopen(libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
-    catch e
-        @info e
+    libpy_handle = libpython === nothing ? C_NULL :
         Libdl.dlopen(joinpath(Pkg.depots1(), "conda", "3", "lib", "libpython3.9.so.1.0"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
-    end
 
     already_inited = 0 != ccall((@pysym :Py_IsInitialized), Cint, ())
 
