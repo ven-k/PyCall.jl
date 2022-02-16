@@ -146,8 +146,15 @@ function __init__()
     end
 
     if !ispath(libpython)
-        Pkg.build("PyCall")
-        @info "Updated $libpython"
+        global libpython = joinpath(Pkg.depots1(), "conda", "3", "lib", "libpython3.9.so.1.0")
+        src_conda_loc    = joinpath(Pkg.depots1(), "artifacts", "conda")
+        target_conda_loc = joinpath(Pkg.depots1(), "conda")
+        !isdir(libpython) && !isdir(target_conda_loc) && mv(src_conda_loc, target_conda_loc)
+        global python          = joinpath(Pkg.depots1(), "conda/3/bin/python")
+        global libpython       = joinpath(Pkg.depots1(), "conda/3/lib/libpython3.9.so.1.0")
+        global pyprogramname   = joinpath(Pkg.depots1(), "conda/3/bin/python")
+        global pyversion_build = v"3.9.7"
+        global PYTHONHOME      = "$(Pkg.depots1())/conda/3:$(Pkg.depots1())/conda/3"
     end
 
     # issue #189
