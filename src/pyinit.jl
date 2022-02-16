@@ -126,7 +126,7 @@ function Py_Finalize()
 end
 
 function __init__()
-    ENV["PYTHON"]=Python_jll.libpython
+    ENV["PYTHON"]=Python_jll.get_python_path()
     @info "env" ENV["PYTHON"]
     # Clear out global states.  This is required only for PyCall
     # AOT-compiled into system image.
@@ -162,7 +162,7 @@ function __init__()
     # issue #189
     try
         @info "libpython: " libpython
-        global libpy_handle = Libdl.dlopen(Python_jll.libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+        global libpy_handle = Libdl.dlopen(Python_jll.get_libpython_path(), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
         @info "libpy_handle" libpy_handle
     catch e
         @info "Initializing the libpy_handle failed: " e
@@ -213,8 +213,9 @@ function __init__()
         end
 
         @info("about to call Py_SetPythonHome()", libpy_handle, libpython)
-        Py_SetPythonHome(libpy_handle, pyversion, pyhome)
-        Py_SetProgramName(libpy_handle, pyversion, current_python())
+        new_pyversion = v"0.3.8"
+        Py_SetPythonHome(libpy_handle, new_pyversion, Python_jll.find_artifact_dir())
+        Py_SetProgramName(libpy_handle, new_pyversion, Python_jll.get_python_path())
         ccall((@pysym :Py_InitializeEx), Cvoid, (Cint,), 0)
     end
 
