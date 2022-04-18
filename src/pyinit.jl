@@ -145,9 +145,20 @@ function __init__()
         error("Using Conda.jl python, but location of $python seems to have moved to $(Conda.PYTHONDIR).  Re-run Pkg.build(\"PyCall\") and restart Julia.")
     end
 
+    if !ispath(libpython)
+        ENV["PYTHON"]="$(Pkg.depots1())/artifacts/4dcd8a52e092c1e82cef8e0c0ed138b30c4cd17b/bin/python3"
+        ENV["LD_LIBRARY_PATH"]="$(Pkg.depots1())/artifacts/87bafe0241306176b06ea2cc2f0b9674e662a24e/lib:$(Pkg.depots1())/artifacts/a720905290c81768185376a3ab5842c296b4cef8/lib:$(Pkg.depots1())/artifacts/d00220164876dea2cb19993200662745eed5e2db/lib:/opt/julia-1.6.5/bin/../lib/julia:$(Pkg.depots1())/artifacts/06dee17b66b6d255d180994b3ada0f39a853effb/lib:$(Pkg.depots1())/artifacts/02d9b78ed041cc654102f58897ae46fac83ca63f/lib:$(Pkg.depots1())/artifacts/4dcd8a52e092c1e82cef8e0c0ed138b30c4cd17b/lib:/opt/julia-1.6.5/lib/julia:/opt/julia-1.6.5/lib"
+        global libpython = joinpath(Pkg.depots1(), "artifacts", "4dcd8a52e092c1e82cef8e0c0ed138b30c4cd17b", "lib", "libpython3.8.so.1.0")
+        global python          = joinpath(Pkg.depots1(), "artifacts/4dcd8a52e092c1e82cef8e0c0ed138b30c4cd17b/bin/python3")
+        global libpython       = joinpath(Pkg.depots1(), "artifacts/4dcd8a52e092c1e82cef8e0c0ed138b30c4cd17b/lib/libpython3.8.so.1.0")
+        global pyprogramname   = joinpath(Pkg.depots1(), "artifacts/4dcd8a52e092c1e82cef8e0c0ed138b30c4cd17b/bin/python3")
+        global pyversion_build = v"3.8.1"
+        global PYTHONHOME      = "$(Pkg.depots1())/artifacts/4dcd8a52e092c1e82cef8e0c0ed138b30c4cd17b:$(Pkg.depots1())/artifacts/4dcd8a52e092c1e82cef8e0c0ed138b30c4cd17b"
+    end
+
     # issue #189
     libpy_handle = libpython === nothing ? C_NULL :
-        Libdl.dlopen(libpython, Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+        Libdl.dlopen(joinpath(Pkg.depots1(), "artifacts", "4dcd8a52e092c1e82cef8e0c0ed138b30c4cd17b", "lib", "libpython3.8.so.1.0"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
 
     already_inited = 0 != ccall((@pysym :Py_IsInitialized), Cint, ())
 
