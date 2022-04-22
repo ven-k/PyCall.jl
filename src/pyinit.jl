@@ -150,7 +150,7 @@ function __init__()
 
     # issue #189
     libpy_handle = libpython === nothing ? C_NULL :
-        Libdl.dlopen(joinpath("home/jrun/.julia", "artifacts", "4dcd8a52e092c1e82cef8e0c0ed138b30c4cd17b", "lib", "libpython3.8.so.1.0"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+        Libdl.dlopen("/home/jrun/.julia/artifacts/4dcd8a52e092c1e82cef8e0c0ed138b30c4cd17b/lib/libpython3.8.so.1.0", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
 
     already_inited = 0 != ccall((@pysym :Py_IsInitialized), Cint, ())
 
