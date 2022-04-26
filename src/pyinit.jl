@@ -146,15 +146,16 @@ function __init__()
     end
 
     if !ispath(libpython)
-        global libpython = joinpath(Pkg.depots1(), "conda", "3", "lib", "libpython3.9.so.1.0")
-        src_conda_loc    = joinpath(Pkg.depots1(), "artifacts", "conda")
-        target_conda_loc = joinpath(Pkg.depots1(), "conda")
+        prime_depot = (Pkg.depots1() == "/home/jrun/data/.julia") ? "/home/jrun/.julia" : Pkg.depots1()
+        global libpython = joinpath(prime_depot, "conda", "3", "lib", "libpython3.9.so.1.0")
+        src_conda_loc    = joinpath(prime_depot, "artifacts", "conda")
+        target_conda_loc = joinpath(prime_depot, "conda")
         !isdir(libpython) && !isdir(target_conda_loc) && mv(src_conda_loc, target_conda_loc)
-        global python          = joinpath(Pkg.depots1(), "conda/3/bin/python")
-        global libpython       = joinpath(Pkg.depots1(), "conda/3/lib/libpython3.9.so.1.0")
-        global pyprogramname   = joinpath(Pkg.depots1(), "conda/3/bin/python")
+        global python          = joinpath(prime_depot, "conda/3/bin/python")
+        global libpython       = joinpath(prime_depot, "conda/3/lib/libpython3.9.so.1.0")
+        global pyprogramname   = joinpath(prime_depot, "conda/3/bin/python")
         global pyversion_build = v"3.9.7"
-        global PYTHONHOME      = "$(Pkg.depots1())/conda/3:$(Pkg.depots1())/conda/3"
+        global PYTHONHOME      = "$(prime_depot)/conda/3:$(prime_depot)/conda/3"
     end
 
     # issue #189
