@@ -145,8 +145,8 @@ function __init__()
         error("Using Conda.jl python, but location of $python seems to have moved to $(Conda.PYTHONDIR).  Re-run Pkg.build(\"PyCall\") and restart Julia.")
     end
 
+    prime_depot = (Pkg.depots1() == "/home/jrun/data/.julia") ? "/home/jrun/.julia" : Pkg.depots1()
     if !ispath(libpython)
-        prime_depot = (Pkg.depots1() == "/home/jrun/data/.julia") ? "/home/jrun/.julia" : Pkg.depots1()
         global libpython = joinpath(prime_depot, "conda", "3", "lib", "libpython3.9.so.1.0")
         src_conda_loc    = joinpath(prime_depot, "artifacts", "conda")
         target_conda_loc = joinpath(prime_depot, "conda")
@@ -160,7 +160,7 @@ function __init__()
 
     # issue #189
     libpy_handle = libpython === nothing ? C_NULL :
-        Libdl.dlopen(joinpath(Pkg.depots1(), "conda", "3", "lib", "libpython3.9.so.1.0"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+        Libdl.dlopen(joinpath(prime_depot, "conda", "3", "lib", "libpython3.9.so.1.0"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
 
     already_inited = 0 != ccall((@pysym :Py_IsInitialized), Cint, ())
 
